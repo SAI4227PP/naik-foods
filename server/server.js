@@ -24,9 +24,9 @@ const allowedOrigins = [
 
 app.use(
   cors({
-<<<<<<< HEAD
+
     origin: process.env.CLIENT_URL || 'http://localhost:5173' || 'https://naikclient.vercel.app/',
-=======
+
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true)
@@ -36,7 +36,6 @@ app.use(
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
->>>>>>> 25bcbe42988104e92af65f0ae9f0e53be750d045
   }),
 )
 

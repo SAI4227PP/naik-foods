@@ -1,130 +1,109 @@
-import { Link } from 'react-router-dom'
+import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react'
 
-function CartItem({
-  item,
-  isSyncing,
-  onRemove,
-  onUpdateQuantity,
-}) {
-  const itemTotal =
-    item.price * item.quantity
+function CartItem({ item, onUpdateQuantity, onRemove }) {
+  const productId = item.id || item._id
 
-  const canIncrease =
-    item.quantity < item.stock
+  const price = Number(item.price || 0)
+  const quantity = Number(item.quantity || 1)
+  const stock = Number(item.stock ?? 999)
+  const itemTotal = price * quantity
+
+  const decrease = () => {
+    if (quantity > 1) {
+      onUpdateQuantity(productId, quantity - 1)
+    }
+  }
+
+  const increase = () => {
+    if (quantity < stock) {
+      onUpdateQuantity(productId, quantity + 1)
+    }
+  }
 
   return (
-    <article className="rounded-2xl border border-[#ead9c4] bg-[#fffdf8] p-4 shadow-sm sm:p-5">
+    <article className="group rounded-3xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-orange-200 hover:shadow-md sm:p-5">
       <div className="flex gap-4">
-        {/* Image */}
-        <Link
-          to={`/product/${item.id}`}
-          className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#f8e6c5] sm:h-36 sm:w-36"
-        >
+        {/* Product image */}
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-orange-50 sm:h-28 sm:w-28">
           {item.image ? (
             <img
               src={item.image}
               alt={item.name}
-              className="h-full w-full object-contain p-3"
+              className="h-full w-full object-contain p-2 transition duration-300 group-hover:scale-105"
+              loading="lazy"
             />
           ) : (
-            <div className="text-center">
-              <div className="font-serif text-2xl font-bold text-[#6d2e16]">
-                Naik
-              </div>
-
-              <div className="text-xs font-semibold text-[#9a4b26]">
-                Foods
-              </div>
+            <div className="flex h-full w-full items-center justify-center text-orange-300">
+              <ShoppingBag size={30} />
             </div>
           )}
-        </Link>
+        </div>
 
-        {/* Product Details */}
+        {/* Details */}
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <Link
-                to={`/product/${item.id}`}
-              >
-                <h2 className="font-serif text-xl font-bold text-[#3d2519] transition hover:text-[#9a4b26]">
-                  {item.name}
-                </h2>
-              </Link>
+            <div className="min-w-0">
+              <h3 className="line-clamp-2 text-sm font-bold leading-5 text-stone-800 sm:text-base">
+                {item.name}
+              </h3>
 
               {item.weight && (
-                <p className="mt-1 text-sm text-[#795746]">
+                <p className="mt-1 text-xs text-stone-400">
                   {item.weight}
                 </p>
               )}
             </div>
 
-            {/* Remove */}
             <button
               type="button"
-              onClick={() =>
-                onRemove(item.id)
-              }
-              disabled={isSyncing}
+              onClick={() => onRemove(productId)}
+              className="shrink-0 rounded-xl p-2 text-stone-400 transition hover:bg-red-50 hover:text-red-500 focus:outline-none focus:ring-4 focus:ring-red-100"
               aria-label={`Remove ${item.name}`}
-              className="rounded-full p-2 text-xl text-[#8b7565] transition hover:bg-red-50 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+              title="Remove item"
             >
-              ×
+              <Trash2 size={17} />
             </button>
           </div>
 
-          {/* Quantity + Price */}
-          <div className="mt-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             {/* Quantity */}
-            <div className="flex items-center">
+            <div className="flex items-center rounded-xl border border-stone-200 bg-stone-50">
               <button
                 type="button"
-                onClick={() =>
-                  onUpdateQuantity(
-                    item.id,
-                    item.quantity - 1,
-                  )
-                }
-                disabled={
-                  item.quantity <= 1 ||
-                  isSyncing
-                }
-                className="flex h-9 w-9 items-center justify-center rounded-l-lg border border-[#d9c5ae] bg-[#fff8ed] text-lg font-bold text-[#6d2e16] disabled:cursor-not-allowed disabled:opacity-40"
+                onClick={decrease}
+                disabled={quantity <= 1}
+                className="flex h-9 w-9 items-center justify-center rounded-l-xl text-stone-600 transition hover:bg-white hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-35"
+                aria-label="Decrease quantity"
               >
-                −
+                <Minus size={15} />
               </button>
 
-              <span className="flex h-9 min-w-12 items-center justify-center border-y border-[#d9c5ae] bg-white px-3 text-sm font-bold text-[#3d2519]">
-                {item.quantity}
+              <span className="flex h-9 min-w-9 items-center justify-center border-x border-stone-200 bg-white px-2 text-sm font-bold text-stone-800">
+                {quantity}
               </span>
 
               <button
                 type="button"
-                onClick={() =>
-                  onUpdateQuantity(
-                    item.id,
-                    item.quantity + 1,
-                  )
-                }
-                disabled={
-                  !canIncrease ||
-                  isSyncing
-                }
-                className="flex h-9 w-9 items-center justify-center rounded-r-lg border border-[#d9c5ae] bg-[#fff8ed] text-lg font-bold text-[#6d2e16] disabled:cursor-not-allowed disabled:opacity-40"
+                onClick={increase}
+                disabled={quantity >= stock}
+                className="flex h-9 w-9 items-center justify-center rounded-r-xl text-stone-600 transition hover:bg-white hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-35"
+                aria-label="Increase quantity"
               >
-                +
+                <Plus size={15} />
               </button>
             </div>
 
             {/* Price */}
-            <div className="text-left sm:text-right">
-              <p className="text-xs text-[#8b7565]">
-                ₹{item.price} ×{' '}
-                {item.quantity}
+            <div className="text-right">
+              <p className="text-base font-extrabold text-orange-600">
+                ₹{itemTotal.toLocaleString('en-IN')}
               </p>
 
-              <p className="mt-1 text-xl font-bold text-[#6d2e16]">
-                ₹{itemTotal}
-              </p>
+              {quantity > 1 && (
+                <p className="text-xs text-stone-400">
+                  ₹{price.toLocaleString('en-IN')} each
+                </p>
+              )}
             </div>
           </div>
         </div>

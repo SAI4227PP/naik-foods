@@ -3,10 +3,12 @@ import ProductCard from './ProductCard'
 function ProductGrid({ products, onAddToCart }) {
   if (!products || products.length === 0) {
     return (
-      <div className="rounded-2xl border border-[#ead9c4] bg-[#fffdf8] px-6 py-16 text-center">
-        <div className="text-5xl">🍱</div>
+      <div className="rounded-3xl border border-[#ead9c4] bg-white px-6 py-16 text-center shadow-sm">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#fff1dc] text-4xl">
+          🍱
+        </div>
 
-        <h3 className="mt-4 font-serif text-2xl font-bold text-[#6d2e16]">
+        <h3 className="mt-5 font-serif text-2xl font-bold text-[#6d2e16]">
           No products found
         </h3>
 
@@ -25,7 +27,7 @@ function ProductGrid({ products, onAddToCart }) {
     >
       {products.map((product) => (
         <ProductCard
-          key={product.id}
+          key={product.id || product._id}
           product={product}
           onAddToCart={onAddToCart}
         />

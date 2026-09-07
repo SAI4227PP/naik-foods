@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { ArrowLeft, ShoppingBag } from 'lucide-react'
+
 import { useCart } from '../context/CartContext'
 
 import Loading from '../components/Loading'
@@ -17,74 +19,42 @@ function Cart() {
     isLoading,
     isSyncing,
     error,
-    removeFromCart,
     updateQuantity,
+    removeFromCart,
     clearCart,
   } = useCart()
 
-  /*
-   * Initial cart loading
-   */
   if (isLoading) {
     return (
-      <main className="min-h-[70vh] px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          <div className="rounded-3xl border border-[#ead9c4] bg-[#fffdf8] px-6 py-20 text-center shadow-sm">
-            <Loading
-              type="cart"
-              count={1}
-            />
-
-            <h1 className="mt-6 font-serif text-3xl font-bold text-[#3d2519]">
-              Loading your cart...
-            </h1>
-
-            <p className="mt-2 text-[#795746]">
-              Syncing your cart with our
-              server.
-            </p>
-          </div>
-        </div>
+      <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <Loading />
       </main>
     )
   }
 
-  /*
-   * Empty cart
-   */
-  if (cartItems.length === 0) {
+  if (!cartItems.length) {
     return (
-      <main className="min-h-[70vh] px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl">
+      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="mx-auto max-w-2xl">
           <EmptyState
-            icon="🧺"
+            icon={<ShoppingBag size={34} />}
             title="Your cart is empty"
-            message="Looks like you haven't added any authentic Maharashtrian favourites yet. Explore our collection and build your box."
+            message="Looks like you haven't added anything yet. Explore our authentic Maharashtrian products and find something delicious."
           />
 
           {error && (
-            <div className="mx-auto mt-5 max-w-lg">
-              <ErrorMessage
-                title="Cart error"
-                message={error}
-                buttonText="Try Again"
-              />
+            <div className="mt-5">
+              <ErrorMessage message={error} />
             </div>
           )}
 
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className="mt-6 flex justify-center">
             <Link
               to="/store"
-              className="rounded-full bg-[#6d2e16] px-7 py-3 text-center font-bold text-white transition hover:bg-[#9a4b26]"
+              className="inline-flex items-center gap-2 rounded-2xl bg-orange-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-orange-700 hover:shadow-md"
             >
-              Explore Store
-            </Link>
-
-            <Link
-              to="/combo"
-              className="rounded-full border border-[#6d2e16] px-7 py-3 text-center font-bold text-[#6d2e16] transition hover:bg-[#fff1dc]"
-            >
-              Build Your Box
+              <ShoppingBag size={17} />
+              Start Shopping
             </Link>
           </div>
         </div>
@@ -93,103 +63,91 @@ function Cart() {
   }
 
   return (
-    <main className="px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+    <main className="overflow-hidden">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#9a4b26]">
-            Your Selection
-          </p>
+          <Link
+            to="/store"
+            className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-stone-500 transition hover:text-orange-600"
+          >
+            <ArrowLeft size={16} />
+            Continue Shopping
+          </Link>
 
-          <div className="mt-2 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
-              <h1 className="font-serif text-4xl font-bold text-[#3d2519]">
-                Shopping Cart
-              </h1>
-
-              <p className="mt-2 text-[#795746]">
-                {cartCount}{' '}
-                {cartCount === 1
-                  ? 'item'
-                  : 'items'}{' '}
-                selected
+              <p className="text-sm font-semibold uppercase tracking-wider text-orange-600">
+                Your Shopping Cart
               </p>
+
+              <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-stone-800 sm:text-4xl">
+                Cart
+              </h1>
             </div>
 
-            <button
-              type="button"
-              onClick={clearCart}
-              disabled={isSyncing}
-              className="self-start rounded-full border border-red-200 px-4 py-2 text-sm font-bold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
-            >
-              {isSyncing
-                ? 'Updating...'
-                : 'Clear Cart'}
-            </button>
+            <p className="text-sm text-stone-500">
+              {cartCount} {cartCount === 1 ? 'item' : 'items'}
+            </p>
           </div>
         </div>
-
-        {/* Sync message */}
-        {isSyncing && (
-          <div className="mb-6 flex items-center gap-3 rounded-xl border border-[#ead9c4] bg-[#fffdf8] px-4 py-3 text-sm font-semibold text-[#6d2e16]">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#ead9c4] border-t-[#6d2e16]" />
-
-            Updating your cart...
-          </div>
-        )}
 
         {/* Error */}
         {error && (
           <div className="mb-6">
-            <ErrorMessage
-              title="Cart update failed"
-              message={error}
-              buttonText="Try Again"
-            />
+            <ErrorMessage message={error} />
           </div>
         )}
 
-        {/* Free Delivery */}
-        <CartProgress
-          cartSubtotal={cartSubtotal}
-          remainingForFreeDelivery={
-            remainingForFreeDelivery
-          }
-        />
+        {/* Sync status */}
+        {isSyncing && (
+          <div className="mb-5 flex items-center gap-2 rounded-2xl border border-orange-100 bg-orange-50 px-4 py-3 text-sm font-medium text-orange-700">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-orange-200 border-t-orange-600" />
+            Updating your cart...
+          </div>
+        )}
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-          {/* Cart Items */}
-          <section>
+        {/* Free delivery progress */}
+        <div className="mb-6">
+          <CartProgress
+            subtotal={cartSubtotal}
+            remainingForFreeDelivery={remainingForFreeDelivery}
+          />
+        </div>
+
+        {/* Main cart layout */}
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          {/* Cart items */}
+          <section className="min-w-0">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-extrabold text-stone-800">
+                Your Items
+              </h2>
+
+              <button
+                type="button"
+                onClick={clearCart}
+                disabled={isSyncing}
+                className="text-xs font-semibold text-stone-400 transition hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Clear cart
+              </button>
+            </div>
+
             <div className="space-y-4">
               {cartItems.map((item) => (
                 <CartItem
                   key={item.id}
                   item={item}
-                  isSyncing={isSyncing}
+                  onUpdateQuantity={updateQuantity}
                   onRemove={removeFromCart}
-                  onUpdateQuantity={
-                    updateQuantity
-                  }
                 />
               ))}
             </div>
-
-            {/* Continue Shopping */}
-            <div className="mt-6">
-              <Link
-                to="/store"
-                className="inline-flex items-center gap-2 font-bold text-[#6d2e16] hover:text-[#9a4b26]"
-              >
-                ← Continue Shopping
-              </Link>
-            </div>
           </section>
 
-          {/* Order Summary */}
-          <CartSummary
-            cartCount={cartCount}
-            cartSubtotal={cartSubtotal}
-          />
+          {/* Summary */}
+          <CartSummary subtotal={cartSubtotal} />
         </div>
       </div>
     </main>

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ArrowLeft,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -23,6 +22,7 @@ import ProductGrid from '../components/ProductGrid'
 import {
   getProductById,
   getProducts,
+  getRecommendations,
 } from '../services/api'
 
 const UNWANTED_TAGS = new Set([
@@ -100,6 +100,8 @@ function ProductDetails({ onAddToCart }) {
   const [product, setProduct] = useState(null)
   const [relatedProducts, setRelatedProducts] =
     useState([])
+  const [recommendations, setRecommendations] =
+    useState([])
 
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
@@ -111,8 +113,12 @@ function ProductDetails({ onAddToCart }) {
   const [loading, setLoading] = useState(true)
   const [relatedLoading, setRelatedLoading] =
     useState(true)
+  const [recommendationsLoading, setRecommendationsLoading] =
+    useState(true)
 
   const [error, setError] = useState('')
+  const [recommendationsError, setRecommendationsError] =
+    useState('')
   const [adding, setAdding] = useState(false)
   const [addedMessage, setAddedMessage] =
     useState('')
@@ -160,6 +166,71 @@ function ProductDetails({ onAddToCart }) {
       mounted = false
     }
   }, [productId])
+
+  useEffect(() => {
+    let mounted = true
+
+    async function loadRecommendations() {
+      const currentProductId =
+        product?.id || product?._id
+
+      if (!currentProductId) {
+        setRecommendations([])
+        setRecommendationsLoading(false)
+        return
+      }
+
+      try {
+        setRecommendationsLoading(true)
+        setRecommendationsError('')
+
+        const data = await getRecommendations([
+          currentProductId,
+        ])
+
+        if (!mounted) return
+
+        const items = Array.isArray(
+          data?.recommendations,
+        )
+          ? data.recommendations
+          : []
+
+        setRecommendations(
+          items
+            .filter(
+              (item) =>
+                String(item.id || item._id) !==
+                String(currentProductId),
+            )
+            .slice(0, 4),
+        )
+      } catch (err) {
+        if (!mounted) return
+
+        console.error(
+          'Failed to load recommendations:',
+          err,
+        )
+
+        setRecommendations([])
+        setRecommendationsError(
+          err.message ||
+            'Unable to load recommendations.',
+        )
+      } finally {
+        if (mounted) {
+          setRecommendationsLoading(false)
+        }
+      }
+    }
+
+    loadRecommendations()
+
+    return () => {
+      mounted = false
+    }
+  }, [product])
 
   useEffect(() => {
     let mounted = true
@@ -1091,7 +1162,55 @@ function ProductDetails({ onAddToCart }) {
         </div>
       </section>
 
-      {/* Related */}
+      {/* Personalized recommendations */}
+      {!recommendationsLoading &&
+        recommendations.length > 0 && (
+          <section className="border-t border-[#ead9c4] bg-[#fff8ed]">
+            <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10 lg:py-16">
+              <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#a64b25]">
+                    Curated for you
+                  </p>
+
+                  <h2 className="mt-2 font-serif text-3xl font-bold text-[#5f2814]">
+                    Recommended For You
+                  </h2>
+
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-[#795746]">
+                    Discover products selected from shared category, region, tags and product attributes.
+                  </p>
+                </div>
+
+                <Link
+                  to="/store"
+                  className="text-sm font-bold text-[#8f3f1f] underline underline-offset-4"
+                >
+                  Explore all products
+                </Link>
+              </div>
+
+              <ProductGrid
+                products={recommendations}
+                onAddToCart={onAddToCart}
+              />
+            </div>
+          </section>
+        )}
+
+      {!recommendationsLoading &&
+        recommendationsError && (
+          <section className="border-t border-[#ead9c4] bg-[#fff8ed]">
+            <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10">
+              <ErrorMessage
+                title="Recommendations unavailable"
+                message="You can still explore more products from this category."
+              />
+            </div>
+          </section>
+        )}
+
+      {/* Category-related products */}
       {!relatedLoading &&
         relatedProducts.length > 0 && (
           <section className="border-t border-[#ead9c4] bg-white">

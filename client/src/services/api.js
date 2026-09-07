@@ -65,9 +65,16 @@ export async function getProductById(productId) {
 export async function getRecommendations(productIds = []) {
   const query = productIds.join(',')
 
-  return request(
+  const data = await request(
     `/recommendations?cartProductIds=${encodeURIComponent(query)}`,
   )
+
+  return {
+    ...data,
+    recommendations: normalizeProducts(
+      data.recommendations,
+    ),
+  }
 }
 
 export async function getCart(cartId) {

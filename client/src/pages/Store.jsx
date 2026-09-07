@@ -23,6 +23,8 @@ function Store({ onAddToCart }) {
   const [products, setProducts] = useState([])
   const [total, setTotal] = useState(0)
 
+  const [searchInput, setSearchInput] =
+    useState('')
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
   const [region, setRegion] = useState('')
@@ -38,9 +40,19 @@ function Store({ onAddToCart }) {
     useState(false)
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearch(searchInput.trim())
+    }, DEBOUNCE_DELAY)
+
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [searchInput])
+
+  useEffect(() => {
     let mounted = true
 
-    const timeout = setTimeout(async () => {
+    async function loadProducts() {
       try {
         setLoading(true)
         setError('')
@@ -91,11 +103,12 @@ function Store({ onAddToCart }) {
           setLoading(false)
         }
       }
-    }, DEBOUNCE_DELAY)
+    }
+
+    loadProducts()
 
     return () => {
       mounted = false
-      clearTimeout(timeout)
     }
   }, [
     search,
@@ -124,6 +137,7 @@ function Store({ onAddToCart }) {
   ])
 
   const clearFilters = () => {
+    setSearchInput('')
     setSearch('')
     setCategory('')
     setRegion('')
@@ -134,7 +148,7 @@ function Store({ onAddToCart }) {
   }
 
   const hasSearchOrFilters =
-    Boolean(search) ||
+    Boolean(searchInput) ||
     Boolean(category) ||
     Boolean(region) ||
     Boolean(minRating) ||
@@ -189,9 +203,9 @@ function Store({ onAddToCart }) {
 
               <input
                 type="search"
-                value={search}
+                value={searchInput}
                 onChange={(event) =>
-                  setSearch(event.target.value)
+                  setSearchInput(event.target.value)
                 }
                 placeholder="Search snacks, pickles, masalas, noodles..."
                 className="h-14 w-full rounded-2xl border border-[#dfc9b2] bg-white pl-13 pr-5 text-sm font-medium text-[#6d2e16] shadow-sm outline-none transition placeholder:text-[#ad9887] focus:border-[#a64b25] focus:ring-4 focus:ring-orange-100"
@@ -294,11 +308,11 @@ function Store({ onAddToCart }) {
                   Newest first
                 </option>
 
-                <option value="price_asc">
+                <option value="price-low">
                   Price: Low to High
                 </option>
 
-                <option value="price_desc">
+                <option value="price-high">
                   Price: High to Low
                 </option>
 
@@ -323,8 +337,8 @@ function Store({ onAddToCart }) {
           } mt-6 lg:block`}
         >
           <FilterBar
-            search={search}
-            setSearch={setSearch}
+            search={searchInput}
+            setSearch={setSearchInput}
             category={category}
             setCategory={setCategory}
             region={region}
@@ -395,7 +409,7 @@ function Store({ onAddToCart }) {
                 buttonText="Try Again"
                 onRetry={() => {
                   setError('')
-                  setSearch(
+                  setSearchInput(
                     (current) => current,
                   )
                 }}

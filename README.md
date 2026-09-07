@@ -85,7 +85,6 @@ naik-foods/
 │       ├── data/
 │       ├── pages/
 │       └── services/
-│
 ├── server/
 │   ├── config/
 │   ├── controllers/
@@ -94,12 +93,12 @@ naik-foods/
 │   ├── routes/
 │   ├── seed/
 │   └── utils/
-│
+├── api/
+│   └── [...path].js
 ├── docs/
 │   ├── screenshots/
 │   ├── analysis.md
 │   └── architecture.md
-│
 ├── README.md
 └── .gitignore
 ```
@@ -141,16 +140,16 @@ npm install
 ```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=https://naikclient.vercel.app
 ```
 
 ### Frontend — `client/.env`
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=https://naikserver.vercel.app/api
 ```
 
-Do not commit real database credentials or secrets. For deployment, configure environment variables in the hosting platform rather than hard-coding them in source files.
+For local development, you may use `http://localhost:5000/api` instead. Do not commit real database credentials or secrets. Vite environment variables are embedded at build time.
 
 ## Running Locally
 
@@ -194,8 +193,6 @@ The importer retrieves product URLs from the public Store and extracts validated
 cd server
 npm run seed
 ```
-
-The seed pipeline uses Axios and Cheerio and includes extraction fallbacks, price validation, image normalization, tag cleanup and invalid-record handling.
 
 ## Build
 
@@ -254,13 +251,13 @@ name
 ```text
 React + Vite
     │
-    │ HTTP / JSON
+    │ HTTPS / JSON
     ▼
-Node.js + Express
+Vercel Serverless Express API
     │
     │ Mongoose
     ▼
-MongoDB
+MongoDB Atlas
 ```
 
 Feature flow:
@@ -312,26 +309,36 @@ Recommended manual checks:
 
 ## Deployment
 
-Recommended deployment shape:
+The production frontend and backend are deployed on Vercel:
 
 ```text
-Frontend hosting
-      │
-      │ HTTPS / JSON
-      ▼
-Express backend
-      │
-      ▼
-MongoDB Atlas
+Frontend: https://naikclient.vercel.app
+Backend:  https://naikserver.vercel.app
+API:      https://naikserver.vercel.app/api
 ```
 
-### Live links
+The frontend API service uses `VITE_API_URL` when supplied and otherwise falls back to the deployed API URL. The production frontend should use:
 
-- 🌐 **Frontend:** `ADD_DEPLOYED_FRONTEND_URL`
-- ⚙️ **Backend:** `ADD_DEPLOYED_BACKEND_URL`
-- 💻 **Repository:** https://github.com/SAI4227PP/naik-foods
+```env
+VITE_API_URL=https://naikserver.vercel.app/api
+```
 
-Replace the deployment placeholders before final submission.
+After changing a Vite environment variable in Vercel, redeploy the frontend because `VITE_*` values are embedded at build time.
+
+The backend deployment requires `MONGO_URI` and `CLIENT_URL=https://naikclient.vercel.app` in its Vercel environment settings.
+
+### Production checks
+
+```text
+GET https://naikserver.vercel.app/api/health
+GET https://naikserver.vercel.app/api/products
+```
+
+Expected health response:
+
+```json
+{"success":true,"message":"Naik Foods API is running"}
+```
 
 ## Scope & Limitations
 

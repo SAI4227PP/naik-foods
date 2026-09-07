@@ -1,149 +1,132 @@
 # Naik Foods — E-commerce Experience Improvement
 
-Full-stack MERN internship project that turns an analysis of the Naik Foods shopping journey into a working e-commerce prototype. The work focuses on clearer product discovery, stronger product information, a conversion-oriented cart, and a reusable client/server architecture.
+A full-stack MERN-style internship prototype created after analysing the Naik Foods e-commerce shopping journey. The project focuses on **product discovery, purchase confidence, conversion-oriented cart behaviour, guided cross-category shopping, recommendations, and maintainable architecture**.
 
-> This is an assessment prototype. It is not affiliated with or an official replacement for the Naik Foods website.
+> **Assessment prototype:** This project is not affiliated with or an official replacement for the Naik Foods website.
 
-## Project objective
+## Overview
 
-The objective was not to duplicate an existing store. It was to review a real shopping experience, identify practical opportunities, and implement selected improvements that make it easier for customers to find, understand, and purchase products.
+The assignment started with a review of the public Naik Foods shopping experience from both customer and developer perspectives. The prototype then turns selected findings into working features rather than only a visual redesign.
 
-The project considers the experience from both customer and engineering perspectives:
-
-- Product discovery: search, filters, sorting, and category-based browsing
-- Purchase confidence: product images, pricing, ratings, availability, delivery information, and related products
-- Conversion: persistent cart state and a free-delivery progress goal
-- Basket exploration: a custom **Build Your Maharashtra Box** flow
-- Maintainability: reusable React components, an API service layer, REST endpoints, MongoDB models, and server middleware
-
-## Key product decisions
-
-### 1. Improve discovery
-
-The Store page moves beyond a simple grid. Customers can search remotely and refine the result set by category, region, rating, price, availability, and order. This supports both intent-led shopping (for example, searching for a specific snack) and browsing.
-
-### 2. Make free delivery actionable
-
-Rather than presenting the ₹999 free-delivery threshold as static text, the cart displays progress toward it and the amount still required. This turns a delivery rule into a clear shopping goal.
-
-### 3. Encourage multi-category purchases
-
-**Build Your Maharashtra Box** guides customers to choose products from complementary groups—such as a snack, pickle, and everyday favourite—then calculates the combined selection and adds it to the cart.
-
-### 4. Organise product information around a purchase decision
-
-The product page places the gallery, rating, price, weight, stock state, highlights, quantity controls, delivery check, trust messaging, specifications, and related products in a clear sequence.
-
-### 5. Treat imported data as untrusted
-
-The product importer does not blindly save page text. It attempts structured extraction, rejects suspicious prices and invalid records, normalizes image URLs, cleans tags, retains source URLs, and reports import outcomes.
-
-## Features delivered
-
-### Customer-facing experience
-
-- Responsive navigation, footer, home, store, product, cart, combo, about, blog, and contact pages
-- API-backed product catalogue with loading, empty, and error states
-- Debounced search and filters for category, region, rating, price, and in-stock status
-- Product sorting by newest, price, rating, and name
-- Product gallery, highlights, rating, review count, specifications, availability, and related products
-- Quantity controls and add-to-cart actions
-- Persistent cart with add, edit, remove, clear, subtotal, and delivery-progress behaviours
-- Custom Maharashtra Box builder with selection validation and dynamic total
-
-### Engineering implementation
-
-- Reusable React UI components and `CartContext` state management
-- Dedicated frontend API client in `client/src/services/api.js`
-- Express API with products, cart, recommendations, combo, and health endpoints
-- MongoDB persistence via Mongoose
-- CORS configuration, not-found middleware, and centralized API error responses
-- Product-seeding/import script with extraction and validation helpers
-
-## Architecture
+### Core journey
 
 ```text
-React + Vite client
-        |
-        | HTTP / JSON
-        v
-Node.js + Express API
-        |
-        | Mongoose
-        v
-MongoDB
+Discover → Search / Filter → Evaluate Product → Add to Cart
+                     ↓
+             Recommendations
+                     ↓
+              Build a Better Basket
 ```
 
-```text
-client/
-  src/
-    components/     Reusable store, cart, and feedback UI
-    context/        Persistent cart state and actions
-    pages/          Route-level screens
-    services/       API client
-server/
-  config/           MongoDB connection
-  controllers/      Product, cart, combo, and recommendation logic
-  middleware/       Not-found and error handlers
-  models/           Product and Cart schemas
-  routes/           REST endpoint definitions
-  seed/             Product import script
-```
+## Features
 
-## Technology stack
+### Customer experience
 
-| Area | Technologies |
-| --- | --- |
-| Frontend | React 19, Vite, React Router, Tailwind CSS, Lucide React |
-| Backend | Node.js, Express, CORS, dotenv |
-| Database | MongoDB, Mongoose |
+- Responsive Home, Store, Product Details, Cart, Maharashtra Box, About, Blog and Contact pages
+- API-backed product catalogue
+- Search with a 300 ms debounced query effect
+- Category, region, rating, price and stock filters
+- Product sorting by newest, price, rating and name
+- Product gallery, pricing, weight, rating, availability and highlights
+- Pincode-format delivery interaction
+- Persistent server-backed cart
+- Quantity update, remove and clear-cart actions
+- Dynamic **₹999 free-delivery progress**
+- **Build Your Maharashtra Box** guided shopping flow
+- **Recommended For You** contextual product recommendations
+- Loading, empty and error states
+
+### Engineering
+
+- Reusable React components
+- `CartContext` for cart state/actions
+- Central frontend API service
+- Express REST API
+- MongoDB/Mongoose persistence
+- Deterministic server-side recommendation engine
+- Product import/seeding pipeline using Axios + Cheerio
+- Structured-data extraction and product-data validation
+- Image URL normalization
+- Centralized backend error/not-found middleware
+
+## Key Product Decisions
+
+| Problem | Decision | Status |
+|---|---|---|
+| Catalogue discovery | Server-backed search, filters and sorting | ✅ Implemented |
+| Passive ₹999 threshold | Dynamic cart progress | ✅ Implemented |
+| Single-category browsing | Maharashtra Box | ✅ Implemented |
+| Follow-on discovery | Deterministic recommendations | ✅ Implemented |
+| Product confidence | Purchase-oriented Product Details | ✅ Implemented |
+| Unreliable imported content | Structured extraction + validation | ✅ Implemented |
+| Behavioural personalization | User-history/ML recommendations | 🔄 Future |
+| Complete commerce | Payment, checkout, inventory, orders | 🔄 Future |
+
+## Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React 19, Vite, React Router 7, Tailwind CSS 4, Lucide React |
+| Backend | Node.js, Express 5, CORS, dotenv |
+| Database | MongoDB, Mongoose 9 |
 | Data import | Axios, Cheerio |
-| Tooling | npm, ESLint, nodemon, Git |
+| Tooling | npm, ESLint, Nodemon, Git |
 
-## API reference
+## Project Structure
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/health` | API health check |
-| `GET` | `/api/products` | List products with discovery filters |
-| `GET` | `/api/products/:id` | Get one product |
-| `GET` | `/api/cart/:cartId` | Get a cart |
-| `POST` | `/api/cart/:cartId/items` | Add an item |
-| `PUT` | `/api/cart/:cartId/items/:productId` | Change quantity |
-| `DELETE` | `/api/cart/:cartId/items/:productId` | Remove an item |
-| `DELETE` | `/api/cart/:cartId` | Clear a cart |
-| `GET` | `/api/recommendations?cartProductIds=id1,id2` | Get recommendations |
-| `POST` | `/api/combo` | Create/validate a Maharashtra Box selection |
+```text
+naik-foods/
+├── client/
+│   ├── public/
+│   └── src/
+│       ├── assets/
+│       ├── components/
+│       ├── context/
+│       ├── data/
+│       ├── pages/
+│       └── services/
+│
+├── server/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── seed/
+│   └── utils/
+│
+├── docs/
+│   ├── screenshots/
+│   ├── analysis.md
+│   └── architecture.md
+│
+├── README.md
+└── .gitignore
+```
 
-`GET /api/products` accepts `search`, `category`, `region`, `minRating`, `maxPrice`, `inStock`, and `sort` query parameters. Supported server-side sort values are `newest`, `price-low`, `price-high`, `rating`, and `name`.
+## Documentation
 
-## Local setup
+| Document | Purpose |
+|---|---|
+| [`docs/analysis.md`](./docs/analysis.md) | Business, product and customer-experience analysis — what was observed and what should be improved |
+| [`docs/architecture.md`](./docs/architecture.md) | Technical architecture — how the prototype is structured and how the major flows work |
 
-### Prerequisites
+The documentation intentionally separates **product thinking** from **engineering implementation**.
 
-- Node.js 18 or later
+## Prerequisites
+
+- Node.js 18+
 - npm
-- A MongoDB database connection string
+- MongoDB / MongoDB Atlas connection string
 
-### 1. Configure environment variables
+## Installation
 
-Create `server/.env` (do not commit it):
-
-```env
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-CLIENT_URL=http://localhost:5173
-```
-
-Create `client/.env` only if the API is not running at the local default:
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-### 2. Install packages
+Clone the repository and install dependencies separately for the client and server:
 
 ```bash
+git clone https://github.com/SAI4227PP/naik-foods.git
+cd naik-foods
+
 cd server
 npm install
 
@@ -151,80 +134,236 @@ cd ../client
 npm install
 ```
 
-### 3. Run the application
+## Environment Variables
 
-In one terminal:
+### Backend — `server/.env`
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+CLIENT_URL=http://localhost:5173
+```
+
+### Frontend — `client/.env`
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+Do not commit real database credentials or secrets. For deployment, configure environment variables in the hosting platform rather than hard-coding them in source files.
+
+## Running Locally
+
+### Terminal 1 — Backend
 
 ```bash
 cd server
 npm run dev
 ```
 
-In a second terminal:
+API:
+
+```text
+http://localhost:5000
+```
+
+Health check:
+
+```text
+http://localhost:5000/api/health
+```
+
+### Terminal 2 — Frontend
 
 ```bash
 cd client
 npm run dev
 ```
 
-The client runs at `http://localhost:5173` by default and the API at `http://localhost:5000`.
+Frontend:
 
-### 4. Import product data (optional)
+```text
+http://localhost:5173
+```
+
+## Seed Database
+
+The importer retrieves product URLs from the public Store and extracts validated product data.
 
 ```bash
 cd server
 npm run seed
 ```
 
-The import script uses `axios` and `cheerio`. If they are not yet present in `server/package.json`, install and save them before running the seed command:
+The seed pipeline uses Axios and Cheerio and includes extraction fallbacks, price validation, image normalization, tag cleanup and invalid-record handling.
+
+## Build
 
 ```bash
-npm install axios cheerio
+cd client
+npm run build
 ```
 
-## Validation and testing
+Preview the production build locally with:
 
-Suggested manual checks:
+```bash
+npm run preview
+```
 
-- Search, filter, sort, and clear filters on the Store page
-- Open a product, change quantity, and add it to the cart
-- Update quantities, remove items, clear the cart, and verify delivery progress
-- Build a Maharashtra Box and add it to the cart
-- Confirm loading, empty, and error states with the API unavailable or a no-result search
-- Check navigation and layouts on desktop, tablet, and mobile widths
+## API
 
-Run the client linter with:
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/health` | Health check |
+| `GET` | `/api/products` | Product list + filters |
+| `GET` | `/api/products/:id` | Product details |
+| `GET` | `/api/cart/:cartId` | Read cart |
+| `POST` | `/api/cart/:cartId/items` | Add cart item |
+| `PUT` | `/api/cart/:cartId/items/:productId` | Update quantity |
+| `DELETE` | `/api/cart/:cartId/items/:productId` | Remove item |
+| `DELETE` | `/api/cart/:cartId` | Clear cart |
+| `GET` | `/api/recommendations?cartProductIds=id1,id2` | Recommendations |
+| `POST` | `/api/combo` | Validate/create Maharashtra Box selection |
+
+### Product query parameters
+
+`GET /api/products` supports:
+
+```text
+search
+category
+region
+minRating
+maxPrice
+inStock
+sort
+```
+
+Sort values:
+
+```text
+newest
+price-low
+price-high
+rating
+name
+```
+
+## Architecture at a Glance
+
+```text
+React + Vite
+    │
+    │ HTTP / JSON
+    ▼
+Node.js + Express
+    │
+    │ Mongoose
+    ▼
+MongoDB
+```
+
+Feature flow:
+
+```text
+Store ───────────────► Products API
+Product Details ─────► Product API
+Recommendations ─────► Recommendation API
+Cart ─────────────────► Cart API
+Maharashtra Box ──────► Combo API
+```
+
+See [`docs/architecture.md`](./docs/architecture.md) for the complete technical explanation.
+
+## Screenshots
+
+Final submission screenshots should be placed in [`docs/screenshots/`](./docs/screenshots/):
+
+- Existing Store baseline
+- Improved Store
+- Product Details
+- Recommended For You
+- Smart Cart
+- Build Your Maharashtra Box
+- Mobile responsive view
+
+> Screenshots should be captured from the final working build. No performance or conversion improvement should be inferred from screenshots alone.
+
+## Validation / Testing
+
+Run the client linter:
 
 ```bash
 cd client
 npm run lint
 ```
 
-## Known implementation notes
+Recommended manual checks:
 
-- The Store UI currently sends `price_asc` and `price_desc` for two sort options, while the server expects `price-low` and `price-high`. The rating, name, and newest options match; aligning these two values is a small follow-up fix.
-- The project contains a functional prototype flow, not checkout, authentication, payment, order, or inventory systems.
-- Never commit `.env` files, database credentials, or `node_modules`. The client and server `.gitignore` files are provided for this purpose.
+- Search and clear Store filters
+- Change sorting and category/region filters
+- Open a product and change quantity
+- Add/update/remove/clear cart items
+- Verify ₹999 delivery progress
+- Load recommendations from Product Details
+- Build and validate a Maharashtra Box
+- Test no-result, loading and API-error states
+- Test desktop, tablet and mobile widths
 
-## Future improvements
+## Deployment
 
-- Authentication, saved addresses, order history, and order tracking
-- Payment integration and server-authoritative checkout pricing
-- Wishlist, coupons, gift cards, subscriptions, and festival bundles
-- Verified reviews, richer recommendations, and search analytics
-- Inventory and order-management dashboards
-- Rate limiting, input sanitization, authorization, HTTPS, observability, and automated tests
-
-## Assignment outcome
-
-This submission demonstrates a complete path from experience analysis to a testable implementation:
+Recommended deployment shape:
 
 ```text
-Existing shopping journey
-        -> identified customer and technical opportunities
-        -> prioritised product decisions
-        -> responsive React experience + REST API + MongoDB models
-        -> reusable foundation for future commerce features
+Frontend hosting
+      │
+      │ HTTPS / JSON
+      ▼
+Express backend
+      │
+      ▼
+MongoDB Atlas
 ```
 
-The delivered prototype prioritizes discovery, conversion, purchase confidence, and maintainability while keeping future commerce requirements clearly separated from completed work.
+### Live links
+
+- 🌐 **Frontend:** `ADD_DEPLOYED_FRONTEND_URL`
+- ⚙️ **Backend:** `ADD_DEPLOYED_BACKEND_URL`
+- 💻 **Repository:** https://github.com/SAI4227PP/naik-foods
+
+Replace the deployment placeholders before final submission.
+
+## Scope & Limitations
+
+This is a working internship-task prototype, not a complete production commerce system.
+
+Not implemented:
+
+- Authentication / authorization
+- Production checkout and payment verification
+- Order management and tracking
+- Inventory administration
+- Behavioural/ML recommendation personalization
+- Real delivery-provider pincode verification
+
+Production hardening would also require stronger request validation, rate limiting, security headers, observability, automated tests, HTTPS, secret management and operational monitoring.
+
+No conversion, revenue, traffic or performance uplift is claimed because the prototype has not been evaluated with production analytics.
+
+## Future Improvements
+
+- Authentication, saved addresses and order history
+- Payment integration and server-authoritative checkout
+- Wishlist, coupons, gift cards and subscriptions
+- Verified reviews with photos and helpful votes
+- Behavioural recommendation personalization
+- Inventory and order-management dashboards
+- Regional/festival SEO landing pages
+- Search analytics and experimentation
+- Automated tests and observability
+
+## Assignment Outcome
+
+The project demonstrates a complete path from **website analysis → product decisions → working full-stack implementation**.
+
+The main focus is practical: reduce discovery friction, improve purchase confidence, make the free-delivery incentive actionable, encourage cross-category shopping, and establish a maintainable foundation for future commerce capabilities.

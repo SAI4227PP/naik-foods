@@ -16,8 +16,6 @@ dotenv.config()
 
 const app = express()
 
-connectDB()
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
@@ -43,6 +41,19 @@ app.use(errorMiddleware)
 
 const PORT = process.env.PORT || 5000
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+// Keep the normal Express server for local development.
+// Vercel uses the serverless handler in /api/[...path].js instead.
+if (process.env.VERCEL !== '1') {
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`)
+      })
+    })
+    .catch((error) => {
+      console.error(`Server startup failed: ${error.message}`)
+      process.exit(1)
+    })
+}
+
+export default app
